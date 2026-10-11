@@ -1,21 +1,32 @@
 ﻿using Microsoft.AspNetCore.SignalR;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SignalR.Hubs
 {
     public class UserHub : Hub
     {
-        public static int TotalViews { get; private set; } = 0;
+        public static int TotalViews { get; set; } = 0;
+        public static int TotalUsers { get; set; } = 0;
 
-        public async Task NewWindowLoaded()
+        public override Task OnConnectedAsync()
+        {
+            TotalUsers++;
+            Clients.All.SendAsync("updateTotalUsers", TotalUsers).GetAwaiter().GetResult();
+            return base.OnConnectedAsync();
+        }
+
+        public override Task OnDisconnectedAsync(Exception? exception)
+        {
+            TotalUsers--;
+            Clients.All.SendAsync("updateTotalUsers", TotalUsers).GetAwaiter().GetResult();
+            return base.OnDisconnectedAsync(exception);
+        }
+
+        public async Task<string> NewWindowLoaded(string name)
         {
             TotalViews++;
-            // Broadcast the updated user count to all connected clients
-            await Clients.All.SendAsync("UpdateUserCount", TotalViews);
+            //send update to all clients that total views have been updated
+            await Clients.All.SendAsync("updateTotalViews", TotalViews);
+            return $"total views from {name} - {TotalViews}";
         }
     }
 }

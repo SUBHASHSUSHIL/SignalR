@@ -1,0 +1,10 @@
+{
+  "version": "3.0",
+  "defaultProvider": "unpkg",
+  "libraries": [
+    {
+      "library": "@microsoft/signalr@10.0.0",
+      "destination": "wwwroot/lib/microsoft/signalr/"
+    }
+  ]
+}
